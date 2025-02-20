@@ -3,14 +3,23 @@ package com.learnify.utils;
 import com.learnify.models.User;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
 public class JwtUtils {
-    private final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    @Value("${jwt.secret:defaultSecretKey123456789012345678901234567890}")
+    private String secretString;
+    
+    private SecretKey getSigningKey() {
+        byte[] keyBytes = secretString.getBytes(StandardCharsets.UTF_8);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+    
     private final long EXPIRATION_TIME = 86400000; // 24 hours
 
     public String generateToken(User user) {
@@ -18,15 +27,15 @@ public class JwtUtils {
                 .subject(user.getEmail())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(SECRET_KEY)
+                .signWith(getSigningKey())
                 .compact();
     }
 
     public String getUsernameFromToken(String token) {
         return Jwts.parser()
-                .verifyWith(SECRET_KEY) // Used in JJWT 0.12+
+                .verifyWith(getSigningKey())
                 .build()
-                .parseSignedClaims(token) // Correct method in 0.12+
+                .parseSignedClaims(token)
                 .getPayload()
                 .getSubject();
     }
@@ -34,13 +43,12 @@ public class JwtUtils {
     public boolean validateToken(String token) {
         try {
             Jwts.parser()
-                .verifyWith(SECRET_KEY)
+                .verifyWith(getSigningKey())
                 .build()
-                .parseSignedClaims(token); // Correct method in 0.12+
+                .parseSignedClaims(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
     }
-    
 }
