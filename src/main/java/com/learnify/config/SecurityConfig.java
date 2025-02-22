@@ -47,6 +47,7 @@ public class SecurityConfig {
                 .requestMatchers("/auth/**").permitAll()
                 .requestMatchers("/error").permitAll() // Allow access to /error endpoint
                 .requestMatchers("/api/courses/**").hasAuthority("ROLE_USER")
+                .requestMatchers("/api/users/**").hasAuthority("ROLE_USER")
                 .anyRequest().authenticated()
             );
 

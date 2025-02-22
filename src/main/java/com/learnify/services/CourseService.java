@@ -57,4 +57,29 @@ public class CourseService {
         return courseRepository.findByIdAndUserId(id, userId)
             .orElseThrow(() -> new RuntimeException("Course not found with id: " + id));
     }
+
+    public List<Course> getCourseByUserId(String userId) {
+        List<Course> courses = courseRepository.findByUserId(userId);
+        if (courses.isEmpty()) {
+            System.out.println("No courses found for email: " + userId);
+        } else {
+            System.out.println("Courses found for email: " + userId);
+        }
+        return courses;
+    }
+
+    public Course UpdateCourse(Course course) {
+        try {
+            Course existingCourse = courseRepository.findById(course.getId())
+                .orElseThrow(() -> new RuntimeException("Course not found with id: " + course.getId()));
+            
+            // Preserve the userId from the existing course
+            course.setUserId(existingCourse.getUserId());
+            
+            // Save the updated course
+            return courseRepository.save(course);
+        } catch (Exception e) {
+            throw new RuntimeException("Error updating course: " + e.getMessage(), e);
+        }
+    }
 }

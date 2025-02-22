@@ -11,5 +11,6 @@ import java.util.Optional;
 public interface CourseRepository extends MongoRepository<Course, String> {
     // Add custom queries if needed
     List<Course> findByUserId(String userId);
+    // List<Course> findByUserEmail(String email);
     Optional<Course> findByIdAndUserId(String id, String userId);
 }

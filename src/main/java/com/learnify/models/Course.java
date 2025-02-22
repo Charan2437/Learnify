@@ -35,6 +35,6 @@ public class Course {
         private String title;
         private String description;
         private String[] resourceUrls;
-        private String status; // "completed", "pending", "future"
+        private String status;
     }
 }
